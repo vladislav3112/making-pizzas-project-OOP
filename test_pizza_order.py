@@ -1,10 +1,9 @@
-from unittest import expectedFailure
 from pizza_order import *
 import builtins
 import pytest
 from unittest.mock import Mock
 import contextlib, io
-
+from click.testing import CliRunner
 
 @pytest.mark.parametrize("test_pizza_obj", [Pepperoni(), Margherita(), Hawaiian()])
 @pytest.mark.parametrize("test_func", [pickup_, delivery_, bake_])
@@ -77,24 +76,38 @@ def test_avg_time(test_pizza_obj, test_pizza_obj_big):
     assert extra_large_pizza_time / OBJ_NUM > large_pizza_time / OBJ_NUM
 
 
-@pytest.mark.parametrize("test_pizza_obj", [Pepperoni(), Margherita(), Hawaiian()])
+@pytest.mark.parametrize("test_pizza_obj", ["pepperoni", "margherita", "hawaiian"])
 @pytest.mark.parametrize("delivery", [True, False])
 @pytest.mark.parametrize("pickup", [True, False])
-def test_order_output(test_pizza_obj):
+def test_order_output(test_pizza_obj, delivery, pickup):
     """Тест для всех типов пицц для всех метода order"""
+    runner = CliRunner()
     mock = Mock()
     mock.side_effect = print  # ensure actual print is called to capture its txt
     print_original = print
     builtins.print = mock
-    expected_out = ""
+    expected_out = "👨‍🍳 Приготовили за {}с!"
+    expected_delivery_out = "🛵 Доставили за {}с!"
+    expected_pickup_out = "🏠 Забрали за {}с!"
     try:
-        str_io = io.StringIO()
-        with contextlib.redirect_stdout(str_io):
-            order(test_pizza_obj)
-        output = str_io.getvalue()
-
+        if(delivery and pickup):
+            print("You can't pickup and get delivery at same time")
+            return
+        if(delivery):
+            result = runner.invoke(order,[test_pizza_obj, '--delivery'])
+        elif(pickup):
+            result = runner.invoke(order,[test_pizza_obj, '--pickup'])
+        else:
+            result = runner.invoke(order,[test_pizza_obj])
+        test_pizza_obj = str_to_class(test_pizza_obj)
         expected_str = expected_out.format(test_pizza_obj.bake_time)
+        assert result.exit_code == 0
         assert print.called  # `called` is a Mock attribute
-        assert output.startswith(expected_str)  # check what function prints
+        assert expected_str in result.output  # check what function prints
+        if(delivery):
+            assert expected_delivery_out.format(test_pizza_obj.delivery_time) in result.output  # check what function prints        
+        if(pickup):
+            assert expected_pickup_out.format(test_pizza_obj.pickup_time) in result.output, "No pickup data in output: " + str(result.output)  # check what function prints        
+
     finally:
         builtins.print = print_original  # ensure print is "unmocked"
