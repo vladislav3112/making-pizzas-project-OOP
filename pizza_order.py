@@ -127,9 +127,4 @@ def order(pizza: Union[str, Pizza], delivery: bool, pickup: bool):
 
 
 if __name__ == "__main__":
-    m = Pepperoni(size="L")
-    print(m.recipe.__dict__)
-    bake_(m)
-    delivery_(m)
-    pickup_(m)
     cli()
