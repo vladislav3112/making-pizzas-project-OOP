@@ -5,6 +5,7 @@ from unittest.mock import Mock
 import contextlib, io
 from click.testing import CliRunner
 
+
 @pytest.mark.parametrize("test_pizza_obj", [Pepperoni(), Margherita(), Hawaiian()])
 @pytest.mark.parametrize("test_func", [pickup_, delivery_, bake_])
 def test_log_output(test_pizza_obj, test_func):
@@ -90,24 +91,31 @@ def test_order_output(test_pizza_obj, delivery, pickup):
     expected_delivery_out = "🛵 Доставили за {}с!"
     expected_pickup_out = "🏠 Забрали за {}с!"
     try:
-        if(delivery and pickup):
+        if delivery and pickup:
             print("You can't pickup and get delivery at same time")
             return
-        if(delivery):
-            result = runner.invoke(order,[test_pizza_obj, '--delivery'])
-        elif(pickup):
-            result = runner.invoke(order,[test_pizza_obj, '--pickup'])
+        if delivery:
+            result = runner.invoke(order, [test_pizza_obj, "--delivery"])
+        elif pickup:
+            result = runner.invoke(order, [test_pizza_obj, "--pickup"])
         else:
-            result = runner.invoke(order,[test_pizza_obj])
+            result = runner.invoke(order, [test_pizza_obj])
         test_pizza_obj = str_to_class(test_pizza_obj)
         expected_str = expected_out.format(test_pizza_obj.bake_time)
         assert result.exit_code == 0
         assert print.called  # `called` is a Mock attribute
         assert expected_str in result.output  # check what function prints
-        if(delivery):
-            assert expected_delivery_out.format(test_pizza_obj.delivery_time) in result.output  # check what function prints        
-        if(pickup):
-            assert expected_pickup_out.format(test_pizza_obj.pickup_time) in result.output, "No pickup data in output: " + str(result.output)  # check what function prints        
+        if delivery:
+            assert (
+                expected_delivery_out.format(test_pizza_obj.delivery_time)
+                in result.output
+            )  # check what function prints
+        if pickup:
+            assert (
+                expected_pickup_out.format(test_pizza_obj.pickup_time) in result.output
+            ), "No pickup data in output: " + str(
+                result.output
+            )  # check what function prints
 
     finally:
         builtins.print = print_original  # ensure print is "unmocked"
