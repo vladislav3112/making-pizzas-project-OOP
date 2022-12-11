@@ -11,7 +11,7 @@ PIZZA_FUNCS_LIST = [pizza_pickup, pizza_delivery, pizza_bake]
 def test_log_output(capsys, test_pizza_obj, test_func):
     """Тест для всех типов пицц для всех основных методов (кроме order)"""
     function_name = test_func.__name__
-    attr_name = function_name + "_time"
+    attr_name = f'{function_name}{"_time"}'
     test_func(test_pizza_obj)
     captured = capsys.readouterr()
     match function_name:

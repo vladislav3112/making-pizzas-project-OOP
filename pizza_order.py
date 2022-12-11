@@ -23,7 +23,7 @@ def log(msg: str):
     def inner_log_func(func: Callable):
         @wraps(func)
         def wrapper(pizza: Pizza):
-            attr = func.__name__ + "_time"
+            attr = f'{func.__name__}{"_time"}'
             f_time = getattr(pizza, attr)
             sleep(f_time)
             print(msg.format(f_time))
@@ -83,7 +83,7 @@ class Pizza:
         self.size = size
         if size == "XL":
             self.pizza_bake_time += 2
-        name = type(self).__name__ + " {}".format(self.emoji)
+        name = f'{type(self).__name__} {self.emoji}'
         self.recipe = Recipe(name, self.recipe_list)
 
 
