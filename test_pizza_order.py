@@ -1,6 +1,6 @@
 import pytest
-from pizza_order import *
 from click.testing import CliRunner
+from pizza_order import *
 
 PIZZA_OBJ_LIST = [Pepperoni(), Margherita(), Hawaiian()]
 PIZZA_FUNCS_LIST = [pizza_pickup, pizza_delivery, pizza_bake]

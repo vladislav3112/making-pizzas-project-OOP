@@ -1,9 +1,9 @@
-import click
+from functools import wraps
 import sys
 from random import randint
 from time import sleep
 from typing import Union, Callable
-from functools import wraps
+import click
 from click_option_group import optgroup, MutuallyExclusiveOptionGroup
 
 
